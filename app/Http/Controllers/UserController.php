@@ -112,13 +112,14 @@ class UserController extends Controller
     }
     public function delete($email){
         $users = Storage::exists('data.json') ? json_decode(Storage::get('data.json'), true) : [];
-        if(!$users) return response()->json(['message' => 'No any record',], 200);
+        if(!$users) return response()->json(['message' => 'No any record',], 404);
         $filteredData = [];
         foreach($users as $user){
             if($user['email'] !== $email){
                 $filteredData[] = $user;
             }
         }
+        if(count($filteredData) === 0)return response()->json(['message' => 'No user found',], 404);
         Storage::disk('local')->delete('data.json');
         Storage::put('data.json', json_encode($filteredData));
         return response()->json([
