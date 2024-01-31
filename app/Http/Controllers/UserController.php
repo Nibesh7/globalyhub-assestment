@@ -14,11 +14,6 @@ class UserController extends Controller
      */
     public function index()
     {
-        // $getFile =  Storage::disk('local')->get('assesment.csv');
-        // $users = unserialize(($getFile));
-        // return response()->json([
-        //     'data' => $users,
-        // ],200);
         $users = Storage::exists('data.json') ? json_decode(Storage::get('data.json'), true) : [];
         return response()->json([
             'data' => $users,
@@ -63,16 +58,7 @@ class UserController extends Controller
         'education' => $request->education ?? '-',
         'contact_mode' => $request->contact_mode ?? '-'
     ];
-    // if($existingData){
-    //     $allData = array_merge($existingData, $data);
-    // }else{
-    //     $allData = $data;
-    // }
 
-    // // Serialize and append the combined data to the CSV file
-    // Storage::put('assesment.csv', serialize($allData));
-
-    // Get the existing data if the file exists
     $existingData = Storage::exists('data.json') ? json_decode(Storage::get('data.json'), true) : [];
     $allData = [];
     // Append the new data to the existing data
@@ -82,7 +68,6 @@ class UserController extends Controller
         $allData[] = $data;
     }
 
-    // Store the data in the file
     Storage::put('data.json', json_encode($allData));
 
 
@@ -124,6 +109,21 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         //
+    }
+    public function delete($email){
+        $users = Storage::exists('data.json') ? json_decode(Storage::get('data.json'), true) : [];
+        if(!$users) return response()->json(['message' => 'No any record',], 200);
+        $filteredData = [];
+        foreach($users as $user){
+            if($user['email'] !== $email){
+                $filteredData[] = $user;
+            }
+        }
+        Storage::disk('local')->delete('data.json');
+        Storage::put('data.json', json_encode($filteredData));
+        return response()->json([
+            'message' => 'User deleted successfully',
+        ], 200);
     }
 
 

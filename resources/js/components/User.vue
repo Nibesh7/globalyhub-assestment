@@ -17,11 +17,12 @@
                     <th>Date of birth</th>
                     <th>Education background</th>
                     <th>Mode of contact</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="tableBody">
                 <tr v-if="userDatas" v-for="user in userDatas">
-                        <td>
+                        <td >
                             {{ user.name }}
                         </td>
                         <td>
@@ -44,6 +45,10 @@
                         </td>
                         <td>
                             {{ user.contact_mode }}
+                        </td>
+                        <td>
+                        <button type="button" class="btn btn-danger" @click="setDataForDelete(user)">Delete</button>
+
                         </td>
                 </tr>
                 <tr v-else >
@@ -134,6 +139,26 @@
                 </div>
             </div>
         </div>
+        <div class="modal" tabindex="-1" role="dialog" :class="{ 'show': showDeleteAlert, 'd-block': showDeleteAlert }">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete User</h5>
+                        <button type="button" class="close" @click="showDeleteAlert=false">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to Delete user <strong> {{ userName }} </strong>  having email <strong>{{ userEmail }} </strong>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @click="showDeleteAlert=false">Close</button>
+
+                        <button type="button" class="btn btn-danger" @click="create()">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </div>
 </template>
@@ -145,6 +170,8 @@ export default {
     data: () => ({
         userDatas:[],
         showModal: false,
+        userEmail: '',
+        userName: '',
         formData: {
             name: '',
             gender: 'male',
@@ -156,6 +183,7 @@ export default {
             education: '',
             contact_mode: 'email',
         },
+        showDeleteAlert:false,
         isNameValid: true,
         isEmailValid: true,
         isAddressValid: true,
@@ -191,19 +219,38 @@ export default {
                 console.log('here')
                 axios.post('/create-user', this.formData).then((res) => {
                     if(res.status === 200){
-                    toast.success("User created successfully !", {
-                        autoClose: 1000,
-                    }); //
-                    this.resetForm();
-                    this.showModal = false;
-                    this.getUser();
-                }
+                        toast.success("User created successfully !", {
+                            autoClose: 1000,
+                        }); //
+                        this.resetForm();
+                        this.showModal = false;
+                        this.getUser();
+                    }
                 });
             }
         },
         getUser(){
             axios.get('/get-user').then(({data})=>{
                 this.userDatas = data.data
+            })
+        },
+        setDataForDelete(user) {
+            this.userEmail = user.email;
+            this.userName = user.name;
+            this.showDeleteAlert = true
+        },
+        deleteUser(email){
+            axios.delete('/delete-user/'+email).then((res) => {
+                if(res.status === 200){
+                    toast.success("User deleted successfully !", {
+                        autoClose: 1000,
+                    });
+                    this.showDeleteAlert = false;
+                    this.userEmail = '';
+                    this.userName = '';
+                    this.getUser();
+
+                }
             })
         },
         resetForm(){

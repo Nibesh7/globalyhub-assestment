@@ -24,3 +24,4 @@ Route::get('/user', function(){
 
 Route::get('/get-user', [UserController::class, 'index']);
 Route::post('/create-user', [UserController::class, 'store']);
+Route::delete('/delete-user/{email}', [UserController::class, 'delete']);
