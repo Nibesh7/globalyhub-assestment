@@ -1,11 +1,9 @@
 <template>
     <div class="container">
-        <!-- Add Button -->
         <button class="btn btn-primary mt-5" style="float: right;" @click="openModal">Create User</button>
         <br> <br>
         <h2>User Lists</h2>
 
-        <!-- Table -->
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -59,7 +57,6 @@
                         </div>
                     </td>
                 </tr>
-                <!-- Table rows will be added dynamically here -->
             </tbody>
         </table>
 
